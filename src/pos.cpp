@@ -7,6 +7,7 @@
 // Copyright (c) 2016-2018 The Qtum developers
 
 #include <pos.h>
+#include <consensus/amount.h>
 #include <txdb.h>
 #include <chain.h>
 #include <chainparams.h>
@@ -122,15 +123,40 @@ bool CheckStakeKernelHash(const CBlockIndex* pindexPrev, unsigned int nBits, uin
     return true;
 }
 
-// Check kernel hash target and coinstake signature
-bool CheckProofOfStake(CBlockIndex* pindexPrev, const CTransaction& tx, unsigned int nBits, BlockValidationState& state, CCoinsViewCache& view, unsigned int nTimeTx)
+// EliteXcoin: coin-age/stake-weighted reward, see pos.h for the formula.
+// Pure integer math (arith_uint256) - deterministic across all nodes/platforms.
+// Bounds check: nValueIn <= 14e9 COIN (~2^60.4) and nTimeWeight bounded by chain
+// age in seconds (no realistic value exceeds ~2^32); their product plus the
+// rate multiplication stays far below 2^256, so this never overflows/wraps.
+CAmount GetProofOfStakeReward(CAmount nValueIn, int64_t nTimeWeight)
 {
+    if (nValueIn <= 0 || nTimeWeight <= 0)
+        return 0;
+
+    static const arith_uint256 nSecondsPerAvgMonth(2629800);   // 365.25d / 12
+    static const arith_uint256 nRateNumerator(172);            // 1.72%
+    static const arith_uint256 nRateDenominator(10000);
+
+    arith_uint256 bnReward = arith_uint256(nValueIn) * arith_uint256(nTimeWeight) * nRateNumerator;
+    bnReward /= (nSecondsPerAvgMonth * nRateDenominator);
+
+    CAmount nReward = (CAmount)bnReward.GetLow64();
+    if (!MoneyRange(nReward))
+        return 0;
+    return nReward;
+}
+
+// Check kernel hash target and coinstake signature
+bool CheckProofOfStake(CBlockIndex* pindexPrev, const CTransaction& tx, unsigned int nBits, BlockValidationState& state, CCoinsViewCache& view, unsigned int nTimeTx, CAmount& nCalculatedStakeReward)
+{
+    nCalculatedStakeReward = 0;
+
     if (!tx.IsCoinStake())
         return error("CheckProofOfStake() : called on non-coinstake %s", tx.GetHash().ToString());
 
     // Kernel (input 0) must match the stake hash target per coin age (nBits)
     const CTxIn& txin = tx.vin[0];
-    
+
     Coin coinPrev;
 
     if (!view.GetCoin(txin.prevout, coinPrev)) {
@@ -147,12 +173,24 @@ bool CheckProofOfStake(CBlockIndex* pindexPrev, const CTransaction& tx, unsigned
         return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "stake-prevout-not-loaded", strprintf("CheckProofOfStake() : Block at height %i for prevout can not be loaded", coinPrev.nHeight));
     }
 
+    // EliteXcoin: coin-age time weight = time elapsed since this output became
+    // spendable (its own creation time, or containing-block time as fallback
+    // for coins with no recorded nTime) up to this stake's timestamp.
+    int64_t nStakeInputTime = coinPrev.nTime ? coinPrev.nTime : blockFrom->nTime;
+    int64_t nTimeWeight = (int64_t)nTimeTx - nStakeInputTime;
+
+    if (nTimeWeight < Params().GetConsensus().nStakeMinAge) {
+        return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "stake-prevout-too-young", strprintf("CheckProofOfStake() : Stake prevout is younger than the minimum stake age, expecting >= %d seconds and only aged %d seconds", Params().GetConsensus().nStakeMinAge, nTimeWeight));
+    }
+
     // Verify signature
     if (!VerifySignature(coinPrev, txin.prevout.hash, tx, 0, SCRIPT_VERIFY_NONE))
         return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "stake-verify-signature-failed", strprintf("CheckProofOfStake() : VerifySignature failed on coinstake %s", tx.GetHash().ToString()));
 
     if (!CheckStakeKernelHash(pindexPrev, nBits, (coinPrev.nTime ? coinPrev.nTime : blockFrom->nTime), coinPrev.out.nValue, txin.prevout, nTimeTx, LogInstance().WillLogCategory(BCLog::COINSTAKE)))
         return state.Invalid(BlockValidationResult::BLOCK_HEADER_SYNC, "stake-check-kernel-failed", strprintf("CheckProofOfStake() : INFO: check kernel failed on coinstake %s", tx.GetHash().ToString())); // may occur during initial download or if behind on block chain sync
+
+    nCalculatedStakeReward = GetProofOfStakeReward(coinPrev.out.nValue, nTimeWeight);
 
     return true;
 }

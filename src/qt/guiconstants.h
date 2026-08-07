@@ -46,12 +46,12 @@ static const int TOOLTIP_WRAP_THRESHOLD = 80;
 /* Number of frames in spinner animation */
 #define SPINNER_FRAMES 36
 
-#define QAPP_ORG_NAME "Blackcoin"
-#define QAPP_ORG_DOMAIN "blackcoin.org"
-#define QAPP_APP_NAME_DEFAULT "Blackmore-Qt"
-#define QAPP_APP_NAME_TESTNET "Blackmore-Qt-testnet"
-#define QAPP_APP_NAME_SIGNET "Blackmore-Qt-signet"
-#define QAPP_APP_NAME_REGTEST "Blackmore-Qt-regtest"
+#define QAPP_ORG_NAME "EliteXcoin"
+#define QAPP_ORG_DOMAIN "elitexcoin.io"
+#define QAPP_APP_NAME_DEFAULT "EliteXcoin-Qt"
+#define QAPP_APP_NAME_TESTNET "EliteXcoin-Qt-testnet"
+#define QAPP_APP_NAME_SIGNET "EliteXcoin-Qt-signet"
+#define QAPP_APP_NAME_REGTEST "EliteXcoin-Qt-regtest"
 
 /* One gigabyte (GB) in bytes */
 static constexpr uint64_t GB_BYTES{1000000000};

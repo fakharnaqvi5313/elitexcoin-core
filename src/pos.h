@@ -40,6 +40,23 @@ bool CheckStakeBlockTimestamp(int64_t nTimeBlock);
 bool CheckKernel(CBlockIndex* pindexPrev, unsigned int nBits, uint32_t nTime, const COutPoint& prevout, CCoinsViewCache& view);
 bool CheckKernel(CBlockIndex* pindexPrev, unsigned int nBits, uint32_t nTime, const COutPoint& prevout, CCoinsViewCache& view, const std::map<COutPoint, CStakeCache>& cache);
 bool CheckStakeKernelHash(const CBlockIndex* pindexPrev, unsigned int nBits, uint32_t blockFromTime, CAmount prevoutValue, const COutPoint& prevout, unsigned int nTimeTx, bool fPrintProofOfStake = false);
-bool CheckProofOfStake(CBlockIndex* pindexPrev, const CTransaction& tx, unsigned int nBits, BlockValidationState& state, CCoinsViewCache& view, unsigned int nTimeTx);
+
+/**
+ * EliteXcoin coin-age staking reward.
+ *
+ * Pays 1.72% of the staked input's value for every average month (365.25/12
+ * days) of coin-age accrued since that input last staked or was received,
+ * pro-rated linearly by the second and uncapped (no maximum coin-age).
+ * Computed entirely in 256-bit integer arithmetic (arith_uint256) so every
+ * node derives the identical floor()'d result - no floating point may be
+ * used in consensus code.
+ *
+ *   reward = floor( nValueIn * nTimeWeight * 172 / (2629800 * 10000) )
+ *
+ * where 2629800s = 365.25d/12 (avg. month) and 172/10000 = 1.72%.
+ */
+CAmount GetProofOfStakeReward(CAmount nValueIn, int64_t nTimeWeight);
+
+bool CheckProofOfStake(CBlockIndex* pindexPrev, const CTransaction& tx, unsigned int nBits, BlockValidationState& state, CCoinsViewCache& view, unsigned int nTimeTx, CAmount& nCalculatedStakeReward);
 void CacheKernel(std::map<COutPoint, CStakeCache>& cache, const COutPoint& prevout, CBlockIndex* pindexPrev, CCoinsViewCache& view);
 #endif // BLACKCOIN_POS_H

@@ -85,33 +85,33 @@ EXTRA_LIBRARIES += \
   $(LIBBITCOIN_ZMQ)
 
 if BUILD_BITCOIND
-  bin_PROGRAMS += blackmored
+  bin_PROGRAMS += elitexcoind
 endif
 
 if BUILD_BITCOIN_NODE
-  bin_PROGRAMS += blackmore-node
+  bin_PROGRAMS += elitexcoin-node
 endif
 
 if BUILD_BITCOIN_CLI
-  bin_PROGRAMS += blackmore-cli
+  bin_PROGRAMS += elitexcoin-cli
 endif
 
 if BUILD_BITCOIN_TX
-  bin_PROGRAMS += blackmore-tx
+  bin_PROGRAMS += elitexcoin-tx
 endif
 
 if ENABLE_WALLET
 if BUILD_BITCOIN_WALLET
-  bin_PROGRAMS += blackmore-wallet
+  bin_PROGRAMS += elitexcoin-wallet
 endif
 endif
 
 if BUILD_BITCOIN_UTIL
-  bin_PROGRAMS += blackmore-util
+  bin_PROGRAMS += elitexcoin-util
 endif
 
 if BUILD_BITCOIN_CHAINSTATE
-  bin_PROGRAMS += blackmore-chainstate
+  bin_PROGRAMS += elitexcoin-chainstate
 endif
 
 .PHONY: FORCE check-symbols check-security
@@ -782,17 +782,17 @@ libbitcoin_cli_a_SOURCES = \
 nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
-# blackmored & blackmore-node binaries #
-blackmore_daemon_sources = bitcoind.cpp
-blackmore_bin_cppflags = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-blackmore_bin_cxxflags = $(AM_CXXFLAGS) $(PIE_FLAGS)
-blackmore_bin_ldflags = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+# elitexcoind & elitexcoin-node binaries #
+elitexcoin_daemon_sources = bitcoind.cpp
+elitexcoin_bin_cppflags = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+elitexcoin_bin_cxxflags = $(AM_CXXFLAGS) $(PIE_FLAGS)
+elitexcoin_bin_ldflags = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
 
 if TARGET_WINDOWS
-blackmore_daemon_sources += bitcoind-res.rc
+elitexcoin_daemon_sources += bitcoind-res.rc
 endif
 
-blackmore_bin_ldadd = \
+elitexcoin_bin_ldadd = \
   $(LIBBITCOIN_WALLET) \
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_UTIL) \
@@ -804,53 +804,53 @@ blackmore_bin_ldadd = \
   $(LIBMEMENV) \
   $(LIBSECP256K1)
 
-blackmore_bin_ldadd += $(BDB_LIBS) $(MINIUPNPC_LIBS) $(NATPMP_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(SQLITE_LIBS)
+elitexcoin_bin_ldadd += $(BDB_LIBS) $(MINIUPNPC_LIBS) $(NATPMP_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(SQLITE_LIBS)
 
-blackmored_SOURCES = $(blackmore_daemon_sources) init/bitcoind.cpp
-blackmored_CPPFLAGS = $(blackmore_bin_cppflags)
-blackmored_CXXFLAGS = $(blackmore_bin_cxxflags)
-blackmored_LDFLAGS = $(blackmore_bin_ldflags)
-blackmored_LDADD = $(LIBBITCOIN_NODE) $(blackmore_bin_ldadd)
+elitexcoind_SOURCES = $(elitexcoin_daemon_sources) init/bitcoind.cpp
+elitexcoind_CPPFLAGS = $(elitexcoin_bin_cppflags)
+elitexcoind_CXXFLAGS = $(elitexcoin_bin_cxxflags)
+elitexcoind_LDFLAGS = $(elitexcoin_bin_ldflags)
+elitexcoind_LDADD = $(LIBBITCOIN_NODE) $(elitexcoin_bin_ldadd)
 
-blackmore_node_SOURCES = $(blackmore_daemon_sources) init/bitcoin-node.cpp
-blackmore_node_CPPFLAGS = $(blackmore_bin_cppflags)
-blackmore_node_CXXFLAGS = $(blackmore_bin_cxxflags)
-blackmore_node_LDFLAGS = $(blackmore_bin_ldflags)
-blackmore_node_LDADD = $(LIBBITCOIN_NODE) $(blackmore_bin_ldadd) $(LIBBITCOIN_IPC) $(LIBMULTIPROCESS_LIBS)
+elitexcoin_node_SOURCES = $(elitexcoin_daemon_sources) init/bitcoin-node.cpp
+elitexcoin_node_CPPFLAGS = $(elitexcoin_bin_cppflags)
+elitexcoin_node_CXXFLAGS = $(elitexcoin_bin_cxxflags)
+elitexcoin_node_LDFLAGS = $(elitexcoin_bin_ldflags)
+elitexcoin_node_LDADD = $(LIBBITCOIN_NODE) $(elitexcoin_bin_ldadd) $(LIBBITCOIN_IPC) $(LIBMULTIPROCESS_LIBS)
 
-# blackmore-cli binary #
-blackmore_cli_SOURCES = bitcoin-cli.cpp
-blackmore_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
-blackmore_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-blackmore_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+# elitexcoin-cli binary #
+elitexcoin_cli_SOURCES = bitcoin-cli.cpp
+elitexcoin_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
+elitexcoin_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+elitexcoin_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
 
 if TARGET_WINDOWS
-blackmore_cli_SOURCES += bitcoin-cli-res.rc
+elitexcoin_cli_SOURCES += bitcoin-cli-res.rc
 endif
 
-blackmore_cli_LDADD = \
+elitexcoin_cli_LDADD = \
   $(LIBBITCOIN_CLI) \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CRYPTO)
 
-blackmore_cli_LDADD += $(EVENT_LIBS)
+elitexcoin_cli_LDADD += $(EVENT_LIBS)
 #
 
-# blackmore-tx binary #
-blackmore_tx_SOURCES = \
+# elitexcoin-tx binary #
+elitexcoin_tx_SOURCES = \
   bitcoin-tx.cpp \
   timedatadummy.cpp
-blackmore_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-blackmore_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-blackmore_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+elitexcoin_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+elitexcoin_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+elitexcoin_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
 
 if TARGET_WINDOWS
-blackmore_tx_SOURCES += bitcoin-tx-res.rc
+elitexcoin_tx_SOURCES += bitcoin-tx-res.rc
 endif
 
-blackmore_tx_LDADD = \
+elitexcoin_tx_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_UTIL) \
@@ -859,13 +859,13 @@ blackmore_tx_LDADD = \
   $(LIBSECP256K1)
 #
 
-# blackmore-wallet binary #
-blackmore_wallet_SOURCES = bitcoin-wallet.cpp
-blackmore_wallet_SOURCES += init/bitcoin-wallet.cpp
-blackmore_wallet_CPPFLAGS = $(blackmore_bin_cppflags)
-blackmore_wallet_CXXFLAGS = $(blackmore_bin_cxxflags)
-blackmore_wallet_LDFLAGS = $(blackmore_bin_ldflags)
-blackmore_wallet_LDADD = \
+# elitexcoin-wallet binary #
+elitexcoin_wallet_SOURCES = bitcoin-wallet.cpp
+elitexcoin_wallet_SOURCES += init/bitcoin-wallet.cpp
+elitexcoin_wallet_CPPFLAGS = $(elitexcoin_bin_cppflags)
+elitexcoin_wallet_CXXFLAGS = $(elitexcoin_bin_cxxflags)
+elitexcoin_wallet_LDFLAGS = $(elitexcoin_bin_ldflags)
+elitexcoin_wallet_LDADD = \
   $(LIBBITCOIN_WALLET_TOOL) \
   $(LIBBITCOIN_WALLET) \
   $(LIBBITCOIN_NODE) \
@@ -879,21 +879,21 @@ blackmore_wallet_LDADD = \
   $(SQLITE_LIBS)
 
 if TARGET_WINDOWS
-blackmore_wallet_SOURCES += bitcoin-wallet-res.rc
+elitexcoin_wallet_SOURCES += bitcoin-wallet-res.rc
 endif
 #
 
-# blackmore-util binary #
-blackmore_util_SOURCES = bitcoin-util.cpp
-blackmore_util_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-blackmore_util_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-blackmore_util_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+# elitexcoin-util binary #
+elitexcoin_util_SOURCES = bitcoin-util.cpp
+elitexcoin_util_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+elitexcoin_util_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+elitexcoin_util_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
 
 if TARGET_WINDOWS
-blackmore_util_SOURCES += bitcoin-util-res.rc
+elitexcoin_util_SOURCES += bitcoin-util-res.rc
 endif
 
-blackmore_util_LDADD = \
+elitexcoin_util_LDADD = \
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_UTIL) \
   $(LIBUNIVALUE) \
@@ -902,17 +902,17 @@ blackmore_util_LDADD = \
   $(LIBSECP256K1)
 #
 
-# blackmore-chainstate binary #
-blackmore_chainstate_SOURCES = bitcoin-chainstate.cpp
-blackmore_chainstate_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BOOST_CPPFLAGS)
-blackmore_chainstate_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+# elitexcoin-chainstate binary #
+elitexcoin_chainstate_SOURCES = bitcoin-chainstate.cpp
+elitexcoin_chainstate_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BOOST_CPPFLAGS)
+elitexcoin_chainstate_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 
-blackmore_chainstate_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(PTHREAD_FLAGS) $(LIBTOOL_APP_LDFLAGS) -static
-blackmore_chainstate_LDADD = $(LIBBITCOINKERNEL)
+elitexcoin_chainstate_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(PTHREAD_FLAGS) $(LIBTOOL_APP_LDFLAGS) -static
+elitexcoin_chainstate_LDADD = $(LIBBITCOINKERNEL)
 
 # libtool is unable to calculate this indirect dependency, presumably because it's a subproject.
 # libsecp256k1 only needs to be linked in when libbitcoinkernel is static.
-blackmore_chainstate_LDADD += $(LIBSECP256K1)
+elitexcoin_chainstate_LDADD += $(LIBSECP256K1)
 #
 
 # bitcoinkernel library #

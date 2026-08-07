@@ -1651,12 +1651,20 @@ CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams, b
     if (fProofOfStake)
         return GetProofOfStakeSubsidy();
 
-    return GetProofOfWorkSubsidy();
+    return GetProofOfWorkSubsidy(nHeight);
 }
 
-// Blackcoin
-CAmount GetProofOfWorkSubsidy()
+// EliteXcoin: the 14B EXC premine is delivered as the coinbase subsidy of
+// block 1, since genesis (block 0)'s own coinbase output is permanently
+// unspendable by construction. Blocks 2..nLastPOWBlock (150) stay PoW-mineable
+// as a short bootstrap window so the premine can clear nCoinbaseMaturity
+// before staking becomes possible (see nLastPOWBlock's comment in
+// kernel/chainparams.cpp for why block 1 alone isn't enough). 100% PoS after.
+CAmount GetProofOfWorkSubsidy(int nHeight)
 {
+    if (nHeight == 1)
+        return CAmount(14000000000LL) * COIN;
+
     return 10000 * COIN;
 }
 
@@ -2207,7 +2215,8 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
     assert(hashPrevBlock == view.GetBestBlock());
 
     // Check proof-of-stake
-    if (block.IsProofOfStake() && params.GetConsensus().IsProtocolV3(block.GetBlockTime()) && !CheckProofOfStake(pindex->pprev, *block.vtx[1], block.nBits, state, view, block.vtx[1]->nTime ? block.vtx[1]->nTime : block.nTime)) {
+    CAmount nMaxStakeReward = 0;
+    if (block.IsProofOfStake() && params.GetConsensus().IsProtocolV3(block.GetBlockTime()) && !CheckProofOfStake(pindex->pprev, *block.vtx[1], block.nBits, state, view, block.vtx[1]->nTime ? block.vtx[1]->nTime : block.nTime, nMaxStakeReward)) {
         LogPrintf("WARNING: %s: check proof-of-stake failed for block %s\n", __func__, block.GetHash().ToString());
         return false; // do not error here as we expect this during initial block download
     }
@@ -2391,7 +2400,10 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
     }
 
     if (block.IsProofOfStake() && params.GetConsensus().IsProtocolV3(block.GetBlockTime())) {
-        CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, params.GetConsensus(), true);
+        // EliteXcoin: the PoS reward cap is the coin-age-weighted amount computed
+        // by CheckProofOfStake() above from the actual kernel input, not a flat
+        // per-block subsidy - see GetProofOfStakeReward() in pos.cpp.
+        CAmount blockReward = nFees + nMaxStakeReward;
         if (nActualStakeReward > blockReward) {
             LogPrintf("ERROR: ConnectBlock(): coinstake pays too much (actual=%d vs limit=%d)\n", nActualStakeReward, blockReward);
             return state.Invalid(BlockValidationResult::BLOCK_CONSENSUS, "bad-cs-amount");

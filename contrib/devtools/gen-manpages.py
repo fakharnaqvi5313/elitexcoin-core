@@ -8,12 +8,12 @@ import sys
 import tempfile
 
 BINARIES = [
-'src/blackmored',
-'src/blackmore-cli',
-'src/blackmore-tx',
-'src/blackmore-wallet',
-'src/blackmore-util',
-'src/qt/blackmore-qt',
+'src/elitexcoind',
+'src/elitexcoin-cli',
+'src/elitexcoin-tx',
+'src/elitexcoin-wallet',
+'src/elitexcoin-util',
+'src/qt/elitexcoin-qt',
 ]
 
 # Paths to external utilities.

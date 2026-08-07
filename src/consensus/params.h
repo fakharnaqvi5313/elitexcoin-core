@@ -122,6 +122,9 @@ struct Params {
     int nLastPOWBlock;
     int nStakeTimestampMask;
     int nCoinbaseMaturity;
+    /** EliteXcoin: minimum coin-age (seconds since the output became spendable)
+     * required before it is eligible to stake. No maximum coin-age is enforced. */
+    int64_t nStakeMinAge;
     /** The best chain should have at least this much work */
     uint256 nMinimumChainWork;
     /** By default assume that the signatures in ancestors of this block are valid */

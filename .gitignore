@@ -151,34 +151,37 @@ dist/
 
 /ci/scratch/
 
-# Blackcoin specifics
+# EliteXcoin specifics
 
 #binaries
-src/blackmore
-src/blackmored
-src/blackmore-cli
-src/blackmore-gui
-src/blackmore-node
-src/blackmore-tx
-src/blackmore-util
-src/blackmore-chainstate
-src/blackmore-wallet
+src/elitexcoin
+src/elitexcoind
+src/elitexcoin-cli
+src/elitexcoin-gui
+src/elitexcoin-node
+src/elitexcoin-tx
+src/elitexcoin-util
+src/elitexcoin-chainstate
+src/elitexcoin-wallet
 src/test/test_blackmore
-src/qt/test/test_blackmore-qt
+src/qt/test/test_elitexcoin-qt
 
 # autoreconf
-src/qt/blackmore-qt.config
-src/qt/blackmore-qt.creator
-src/qt/blackmore-qt.creator.user
-src/qt/blackmore-qt.files
-src/qt/blackmore-qt.includes
+src/qt/elitexcoin-qt.config
+src/qt/elitexcoin-qt.creator
+src/qt/elitexcoin-qt.creator.user
+src/qt/elitexcoin-qt.files
+src/qt/elitexcoin-qt.includes
 
 # Compilation and Qt preprocessor part
-src/qt/blackmore-qt
-Blackmore-Qt.app
+src/qt/elitexcoin-qt
+EliteXcoin-Qt.app
+EliteXcoin-Qt.app/
+dist/
+*.dmg
 
 # Unit-tests
-blackmore-qt_test
+elitexcoin-qt_test
 
 # Output from running db62 installation
 db62/

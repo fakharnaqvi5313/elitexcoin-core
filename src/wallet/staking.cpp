@@ -6,6 +6,7 @@
 // Copyright (c) 2016-2023 The Qtum developers
 
 #include <index/txindex.h>
+#include <pos.h>
 #include <wallet/coincontrol.h>
 #include <wallet/receive.h>
 #include <wallet/staking.h>
@@ -290,6 +291,10 @@ bool CreateCoinStake(CWallet& wallet, unsigned int nBits, int64_t nSearchInterva
     bool fKernelFound = false;
     CScript scriptPubKeyKernel, scriptPubKeyOut;
     bool bMinterKey = false;
+    // EliteXcoin: value and coin-age of the actual kernel input (vin[0]), used
+    // to compute the coin-age-weighted staking reward below.
+    CAmount nKernelValue = 0;
+    int64_t nKernelTime = 0;
 
     for (const std::pair<const CWalletTx*, unsigned int> &pcoin : setCoins)
     {
@@ -375,6 +380,8 @@ bool CreateCoinStake(CWallet& wallet, unsigned int nBits, int64_t nSearchInterva
 
                 txNew.nTime -= n;
                 txNew.vin.push_back(CTxIn(pcoin.first->GetHash(), pcoin.second));
+                nKernelValue = pcoin.first->tx->vout[pcoin.second].nValue;
+                nKernelTime = pcoin.first->tx->nTime;
                 nCredit += pcoin.first->tx->vout[pcoin.second].nValue;
                 vwtxPrev.push_back(tx);
 
@@ -432,8 +439,13 @@ bool CreateCoinStake(CWallet& wallet, unsigned int nBits, int64_t nSearchInterva
         }
     }
 
-    // Calculate reward
-    CAmount nReward = nFees + GetProofOfStakeSubsidy();
+    // Calculate reward: EliteXcoin pays 1.72%/month of the kernel input's value,
+    // pro-rated by its coin-age (time since it last staked/was received). Only
+    // the kernel input (vin[0]) earns a reward; any additional combined inputs
+    // just return their principal (matching the consensus rule in pos.cpp).
+    int64_t nTimeWeight = txNew.nTime - nKernelTime;
+    CAmount nStakeSubsidy = GetProofOfStakeReward(nKernelValue, nTimeWeight);
+    CAmount nReward = nFees + nStakeSubsidy;
     if (nReward < 0)
         return false;
 
@@ -443,7 +455,7 @@ bool CreateCoinStake(CWallet& wallet, unsigned int nBits, int64_t nSearchInterva
 
     if (isDevFundEnabled)
     {
-        nDevCredit = (GetProofOfStakeSubsidy() * wallet.m_donation_percentage) / 100;
+        nDevCredit = (nStakeSubsidy * wallet.m_donation_percentage) / 100;
         nMinerCredit = nReward - nDevCredit;
         nCredit += nMinerCredit;
     }

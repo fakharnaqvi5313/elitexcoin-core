@@ -44,9 +44,7 @@ SplashScreen::SplashScreen(const NetworkStyle* networkStyle)
     QString titleText       = PACKAGE_NAME;
     QString versionText     = QString("Version %1").arg(QString::fromStdString(FormatFullVersion()));
 
-    QString copyrightTextBitcoin     = QChar(0xA9)+QString(" %1-%2 ").arg(2009).arg(COPYRIGHT_YEAR) + QString("The Bitcoin Core developers");
-    QString copyrightTextBlackcoin   = QChar(0xA9)+QString(" %1-%2 ").arg(2014).arg(2018) + QString("The Blackcoin developers");
-    QString copyrightTextBlackmore   = QChar(0xA9)+QString(" %1-%2 ").arg(2018).arg(COPYRIGHT_YEAR) + QString("The Blackcoin More developers");
+    QString copyrightTextEliteXcoin  = QChar(0xA9)+QString(" %1-%2 ").arg(2026).arg(COPYRIGHT_YEAR) + QString("The EliteXcoin developers");
 
     // QString copyrightText   = QString::fromUtf8(CopyrightHolders(strprintf("\xc2\xA9 %u-%u ", 2009, COPYRIGHT_YEAR)).c_str());
     const QString& titleAddText    = networkStyle->getTitleAddText();
@@ -61,12 +59,13 @@ SplashScreen::SplashScreen(const NetworkStyle* networkStyle)
     pixmap.setDevicePixelRatio(devicePixelRatio);
 
     QPainter pixPaint(&pixmap);
-    pixPaint.setPen(QColor(100,100,100));
+    pixPaint.setPen(QColor(0xF5,0xF0,0xE1)); // --exc-text
 
-    // draw a slightly radial gradient
+    // EliteXcoin: gold-on-black radial gradient (mirrors the coin logo's own
+    // background treatment), replacing the upstream white/light-gray splash.
     QRadialGradient gradient(QPoint(0,0), splashSize.width()/devicePixelRatio);
-    gradient.setColorAt(0, Qt::white);
-    gradient.setColorAt(1, QColor(247,247,247));
+    gradient.setColorAt(0, QColor(0x2A,0x2A,0x2E)); // --exc-black-raised
+    gradient.setColorAt(1, QColor(0x0B,0x0B,0x0D)); // --exc-black
     QRect rGradient(QPoint(0,0), splashSize);
     pixPaint.fillRect(rGradient, gradient);
 
@@ -89,7 +88,9 @@ SplashScreen::SplashScreen(const NetworkStyle* networkStyle)
     pixPaint.setFont(QFont(font, 33*fontFactor));
     fm = pixPaint.fontMetrics();
     titleTextWidth  = GUIUtil::TextWidth(fm, titleText);
+    pixPaint.setPen(QColor(0xE6,0xC2,0x5A)); // --exc-gold-mid
     pixPaint.drawText(pixmap.width()/devicePixelRatio-titleTextWidth-paddingRight+2,paddingTop,titleText);
+    pixPaint.setPen(QColor(0xF5,0xF0,0xE1)); // --exc-text
 
     pixPaint.setFont(QFont(font, 15*fontFactor));
 
@@ -107,9 +108,7 @@ SplashScreen::SplashScreen(const NetworkStyle* networkStyle)
         pixPaint.setFont(QFont(font, 10*fontFactor));
         const int x = pixmap.width()/devicePixelRatio-titleTextWidth-paddingRight+5;
         const int y = paddingTop+titleCopyrightVSpace;
-        pixPaint.drawText(x,y,copyrightTextBitcoin);
-        pixPaint.drawText(x,y+10,copyrightTextBlackcoin);
-        pixPaint.drawText(x,y+20,copyrightTextBlackmore);
+        pixPaint.drawText(x,y,copyrightTextEliteXcoin);
     }
 
     // draw additional text if special network

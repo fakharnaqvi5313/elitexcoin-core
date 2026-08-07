@@ -52,6 +52,7 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QFile>
 #include <QLatin1String>
 #include <QLibraryInfo>
 #include <QLocale>
@@ -219,7 +220,7 @@ void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, cons
 }
 
 static int qt_argc = 1;
-static const char* qt_argv = "blackmore-qt";
+static const char* qt_argv = "elitexcoin-qt";
 
 BitcoinApplication::BitcoinApplication()
     : QApplication(qt_argc, const_cast<char**>(&qt_argv))
@@ -545,6 +546,16 @@ int GuiMain(int argc, char* argv[])
 
     // Now that the QApplication is setup and we have parsed our parameters, we can set the platform style
     app.setupPlatformStyle();
+
+    // EliteXcoin: apply the gold-on-black theme app-wide (dark by default,
+    // per the coin's brand spec). Loaded from the same Qt resource bundle as
+    // everything else, so this works identically on every platform.
+    {
+        QFile styleFile(QStringLiteral(":/css/elitexcoin_dark"));
+        if (styleFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qApp->setStyleSheet(QString::fromUtf8(styleFile.readAll()));
+        }
+    }
 
     /// 3. Application identification
     // must be set before OptionsModel is initialized or translations are loaded,

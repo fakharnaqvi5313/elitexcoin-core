@@ -1,30 +1,30 @@
-Blackcoin More
+EliteXcoin Core
 =============
 
 Setup
 ---------------------
-Blackcoin More is the original Blackcoin client and it builds the backbone of the network. It downloads and, by default, stores the entire history of Blackcoin transactions, which requires a few hundred gigabytes of disk space. Depending on the speed of your computer and network connection, the synchronization process can take anywhere from a few hours to a day or more.
+EliteXcoin Core is the original EliteXcoin client and it builds the backbone of the network. It downloads and, by default, stores the entire history of EliteXcoin transactions, which requires a few hundred gigabytes of disk space. Depending on the speed of your computer and network connection, the synchronization process can take anywhere from a few hours to a day or more.
 
-To download Blackcoin More, visit [blackcoinmore.org](https://blackcoinmore.org).
+To download EliteXcoin Core, visit [elitexcoin.io](https://elitexcoin.io).
 
 Running
 ---------------------
-The following are some helpful notes on how to run Blackcoin More on your native platform.
+The following are some helpful notes on how to run EliteXcoin Core on your native platform.
 
 ### Unix
 
 Unpack the files into a directory and run:
 
-- `bin/blackmore-qt` (GUI) or
-- `bin/blackmored` (headless)
+- `bin/elitexcoin-qt` (GUI) or
+- `bin/elitexcoind` (headless)
 
 ### Windows
 
-Unpack the files into a directory, and then run blackmore-qt.exe.
+Unpack the files into a directory, and then run elitexcoin-qt.exe.
 
 ### macOS
 
-Drag Blackcoin More to your applications folder, and then run Blackcoin More.
+Drag EliteXcoin Core to your applications folder, and then run EliteXcoin Core.
 
 ### Need Help?
 

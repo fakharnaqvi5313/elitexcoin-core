@@ -13,7 +13,7 @@
 class ArgsManager;
 
 /**
- * CBaseChainParams defines the base parameters (shared between blackmore-cli and blackmored)
+ * CBaseChainParams defines the base parameters (shared between elitexcoin-cli and elitexcoind)
  * of a given instance of the Bitcoin system.
  */
 class CBaseChainParams

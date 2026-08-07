@@ -1,0 +1,57 @@
+name: test
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**/*.md'
+  pull_request:
+    paths-ignore:
+      - 'doc/**'
+      - 'contrib/**'
+      - '**/*.md'
+
+jobs:
+  unit-tests:
+    name: build + unit tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, macos-14]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libtool autotools-dev automake pkg-config \
+            bsdmainutils python3 libssl-dev libevent-dev libboost-dev \
+            libsqlite3-dev libminiupnpc-dev libnatpmp-dev libzmq3-dev
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install autoconf automake libtool pkg-config boost libevent sqlite
+
+      - name: Build
+        run: |
+          ./autogen.sh
+          ./configure --without-gui --disable-bench --with-daemon=yes
+          make -j"$(nproc 2>/dev/null || sysctl -n hw.ncpu)"
+
+      - name: Run unit tests
+        run: ./src/test/test_blackmore
+
+      - name: Sanity-check binaries start
+        run: |
+          DATADIR="$(mktemp -d)"
+          ./src/elitexcoind -regtest -datadir="$DATADIR" -daemon=0 -printtoconsole=1 &
+          DAEMON_PID=$!
+          ./src/elitexcoin-cli -regtest -datadir="$DATADIR" -rpcwait getblockchaininfo
+          ./src/elitexcoin-cli -regtest -datadir="$DATADIR" stop
+          wait "$DAEMON_PID" || true

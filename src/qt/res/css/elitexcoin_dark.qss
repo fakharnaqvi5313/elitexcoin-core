@@ -1,0 +1,288 @@
+/*
+ * EliteXcoin Qt wallet theme - gold on black, dark by default.
+ * Palette (see coin spec §4 - Qt Style Sheets don't support CSS custom
+ * properties, so these are just documented here and hardcoded below):
+ *
+ *   --exc-gold        #D4AF37   primary accent, buttons, links
+ *   --exc-gold-light  #FBEBA6   highlights, hover states
+ *   --exc-gold-mid    #E6C25A   headings, icons
+ *   --exc-gold-deep   #A87F1E   borders, pressed states
+ *   --exc-gold-shadow #8C6A1D   depth accents
+ *   --exc-black       #0B0B0D   page/app background
+ *   --exc-black-soft  #141416   cards, panels
+ *   --exc-black-raised #2A2A2E elevated surfaces
+ *   --exc-text        #F5F0E1  body text on black
+ */
+
+* {
+    color: #F5F0E1;
+    background-color: #0B0B0D;
+    selection-background-color: #D4AF37;
+    selection-color: #0B0B0D;
+}
+
+QWidget {
+    background-color: #0B0B0D;
+    color: #F5F0E1;
+}
+
+QMainWindow, QDialog {
+    background-color: #0B0B0D;
+}
+
+/* Cards / panels: anything that groups content gets the "soft black" surface */
+QGroupBox, QFrame#frame, QTableView, QTreeView, QListView, QTextEdit, QPlainTextEdit {
+    background-color: #141416;
+    border: 1px solid #2A2A2E;
+    border-radius: 4px;
+}
+
+QGroupBox {
+    margin-top: 1.5ex;
+    padding-top: 1ex;
+    font-weight: bold;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 8px;
+    padding: 0 4px;
+    color: #E6C25A;
+}
+
+/* Headings / labels used as section titles */
+QLabel {
+    background: transparent;
+}
+
+QLabel[class="heading"] {
+    color: #E6C25A;
+    font-weight: bold;
+}
+
+/* Menu bar / menus */
+QMenuBar {
+    background-color: #141416;
+    border-bottom: 1px solid #2A2A2E;
+}
+
+QMenuBar::item {
+    background: transparent;
+    padding: 4px 10px;
+}
+
+QMenuBar::item:selected {
+    background-color: #2A2A2E;
+    color: #E6C25A;
+}
+
+QMenu {
+    background-color: #141416;
+    border: 1px solid #A87F1E;
+}
+
+QMenu::item {
+    padding: 6px 24px 6px 12px;
+}
+
+QMenu::item:selected {
+    background-color: #2A2A2E;
+    color: #FBEBA6;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: #2A2A2E;
+    margin: 4px 0;
+}
+
+/* Buttons: gold-gradient primary action */
+QPushButton {
+    background-color: #2A2A2E;
+    color: #F5F0E1;
+    border: 1px solid #A87F1E;
+    border-radius: 4px;
+    padding: 6px 16px;
+}
+
+QPushButton:hover {
+    background-color: #3A3A3E;
+    border-color: #D4AF37;
+}
+
+QPushButton:pressed {
+    background-color: #8C6A1D;
+    color: #0B0B0D;
+}
+
+QPushButton:disabled {
+    background-color: #141416;
+    color: #6b6b63;
+    border-color: #2A2A2E;
+}
+
+QPushButton:default {
+    background-color: #D4AF37;
+    color: #0B0B0D;
+    border: 1px solid #FBEBA6;
+    font-weight: bold;
+}
+
+QPushButton:default:hover {
+    background-color: #E6C25A;
+}
+
+QPushButton:default:pressed {
+    background-color: #A87F1E;
+}
+
+/* Inputs */
+QLineEdit, QPlainTextEdit, QTextEdit, QSpinBox, QDoubleSpinBox, QComboBox {
+    background-color: #141416;
+    color: #F5F0E1;
+    border: 1px solid #2A2A2E;
+    border-radius: 3px;
+    padding: 3px 6px;
+    selection-background-color: #D4AF37;
+    selection-color: #0B0B0D;
+}
+
+QLineEdit:focus, QPlainTextEdit:focus, QTextEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus {
+    border: 1px solid #D4AF37;
+}
+
+QLineEdit:disabled, QComboBox:disabled {
+    color: #6b6b63;
+    background-color: #0B0B0D;
+}
+
+QComboBox::drop-down {
+    border-left: 1px solid #2A2A2E;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #141416;
+    border: 1px solid #A87F1E;
+    selection-background-color: #2A2A2E;
+    selection-color: #E6C25A;
+}
+
+/* Checkboxes / radio buttons */
+QCheckBox::indicator, QRadioButton::indicator {
+    width: 14px;
+    height: 14px;
+    border: 1px solid #A87F1E;
+    background-color: #141416;
+}
+
+QCheckBox::indicator:checked, QRadioButton::indicator:checked {
+    background-color: #D4AF37;
+}
+
+/* Tables (transaction list, coin control, peers, ...) */
+QHeaderView::section {
+    background-color: #2A2A2E;
+    color: #E6C25A;
+    border: none;
+    border-right: 1px solid #0B0B0D;
+    padding: 4px 6px;
+}
+
+QTableView, QTreeView {
+    gridline-color: #2A2A2E;
+    alternate-background-color: #17171a;
+}
+
+QTableView::item:selected, QTreeView::item:selected {
+    background-color: #8C6A1D;
+    color: #0B0B0D;
+}
+
+/* Tabs */
+QTabWidget::pane {
+    border: 1px solid #2A2A2E;
+    background-color: #0B0B0D;
+}
+
+QTabBar::tab {
+    background-color: #141416;
+    color: #F5F0E1;
+    padding: 6px 14px;
+    border: 1px solid #2A2A2E;
+    border-bottom: none;
+}
+
+QTabBar::tab:selected {
+    background-color: #2A2A2E;
+    color: #E6C25A;
+    border-color: #A87F1E;
+}
+
+/* Scrollbars */
+QScrollBar:vertical, QScrollBar:horizontal {
+    background: #0B0B0D;
+    border: none;
+}
+
+QScrollBar::handle {
+    background: #2A2A2E;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:hover {
+    background: #A87F1E;
+}
+
+QScrollBar::add-line, QScrollBar::sub-line {
+    background: none;
+    border: none;
+}
+
+/* Progress bar (sync progress) */
+QProgressBar {
+    background-color: #141416;
+    border: 1px solid #2A2A2E;
+    border-radius: 3px;
+    text-align: center;
+    color: #F5F0E1;
+}
+
+QProgressBar::chunk {
+    background-color: #D4AF37;
+    border-radius: 2px;
+}
+
+/* Status bar */
+QStatusBar {
+    background-color: #141416;
+    border-top: 1px solid #2A2A2E;
+}
+
+/* Tooltips */
+QToolTip {
+    background-color: #141416;
+    color: #FBEBA6;
+    border: 1px solid #A87F1E;
+    padding: 4px;
+}
+
+/* Toolbar (network/sync indicator icons row) */
+QToolBar {
+    background-color: #141416;
+    border: none;
+    spacing: 4px;
+}
+
+QToolButton {
+    background: transparent;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+QToolButton:hover {
+    background-color: #2A2A2E;
+}
+
+QToolButton:checked {
+    background-color: #8C6A1D;
+}

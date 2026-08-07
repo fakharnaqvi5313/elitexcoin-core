@@ -1,39 +1,39 @@
 # It is not recommended to modify this file in-place, because it will
 # be overwritten during package upgrades. If you want to add further
 # options or overwrite existing ones then use
-# $ systemctl edit blackmored.service
+# $ systemctl edit elitexcoind.service
 # See "man systemd.service" for details.
 
 # Note that almost all daemon options could be specified in
-# /etc/blackmore/blackmore.conf, but keep in mind those explicitly
+# /etc/elitexcoin/elitexcoin.conf, but keep in mind those explicitly
 # specified as arguments in ExecStart= will override those in the
 # config file.
 
 [Unit]
-Description=Blackcoin daemon
-Documentation=https://github.com/CoinBlack/blackcoin-more/blob/master/doc/init.md
+Description=EliteXcoin daemon
+Documentation=https://github.com/elitexcoin/elitexcoin-core/blob/master/doc/init.md
 
 # https://www.freedesktop.org/wiki/Software/systemd/NetworkTarget/
 After=network-online.target
 Wants=network-online.target
 
 [Service]
-ExecStart=/usr/bin/blackmored -pid=/run/blackmored/blackmored.pid \
-                            -conf=/etc/blackmore/blackmore.conf \
-                            -datadir=/var/lib/blackmored \
+ExecStart=/usr/bin/elitexcoind -pid=/run/elitexcoind/elitexcoind.pid \
+                            -conf=/etc/elitexcoin/elitexcoin.conf \
+                            -datadir=/var/lib/elitexcoind \
                             -startupnotify='systemd-notify --ready' \
                             -shutdownnotify='systemd-notify --stopping'
 
 # Make sure the config directory is readable by the service user
 PermissionsStartOnly=true
-ExecStartPre=/bin/chgrp blackcoin /etc/blackmore
+ExecStartPre=/bin/chgrp elitexcoin /etc/elitexcoin
 
 # Process management
 ####################
 
 Type=notify
 NotifyAccess=all
-PIDFile=/run/blackmored/blackmored.pid
+PIDFile=/run/elitexcoind/elitexcoind.pid
 
 Restart=on-failure
 TimeoutStartSec=infinity
@@ -42,20 +42,20 @@ TimeoutStopSec=600
 # Directory creation and permissions
 ####################################
 
-# Run as blackcoin:blackcoin
-User=blackcoin
-Group=blackcoin
+# Run as elitexcoin:elitexcoin
+User=elitexcoin
+Group=elitexcoin
 
-# /run/blackmored
-RuntimeDirectory=blackmored
+# /run/elitexcoind
+RuntimeDirectory=elitexcoind
 RuntimeDirectoryMode=0710
 
-# /etc/blackmore
-ConfigurationDirectory=blackmore
+# /etc/elitexcoin
+ConfigurationDirectory=elitexcoin
 ConfigurationDirectoryMode=0710
 
-# /var/lib/blackmored
-StateDirectory=blackmored
+# /var/lib/elitexcoind
+StateDirectory=elitexcoind
 StateDirectoryMode=0710
 
 # Hardening measures

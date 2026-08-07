@@ -117,7 +117,7 @@ void StartScriptCheckWorkerThreads(int threads_num);
 void StopScriptCheckWorkerThreads();
 
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams, bool fProofOfStake = false);
-CAmount GetProofOfWorkSubsidy();
+CAmount GetProofOfWorkSubsidy(int nHeight);
 CAmount GetProofOfStakeSubsidy();
 
 bool FatalError(kernel::Notifications& notifications, BlockValidationState& state, const std::string& strMessage, const bilingual_str& userMessage = {});

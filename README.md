@@ -1,43 +1,38 @@
-Blackcoin More
+EliteXcoin Core
 =====================================
-[![build](https://github.com/CoinBlack/blackcoin-more/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/CoinBlack/blackcoin-more/actions/workflows/build.yml)
 
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/CoinBlack/blackcoin-more)
+https://elitexcoin.io
 
-https://blackcoinmore.org
-
-What is Blackcoin?
+What is EliteXcoin?
 ----------------
 
-Blackcoin is a decentralised digital currency with near-instant transaction speeds and negligible transaction fees built upon Proof of Stake 3.1 (PoSV3, BPoS) as introduced by the Blackcoin development team.
+EliteXcoin (EXC) is a decentralised, 100%-proof-of-stake digital currency
+forked from Blackcoin's PoS 3.1 (PoSV3, BPoS) codebase, itself built on
+Bitcoin Core. See [ops/GENESIS.md](../ops/GENESIS.md) for the coin's
+consensus parameters, premine, and staking reward formula.
 
-What is Blackcoin More?
+What is EliteXcoin Core?
 ----------------
 
-Blackcoin More is the name of open source software which enables use of the Blackcoin protocol.
-It connects to the Blackcoin peer-to-peer network to download and fully
-validate blocks and transactions. It also includes a wallet and graphical user
-interface, which can be optionally built.
-
-For more information, as well as an immediately usable, binary version of
-the Blackcoin More software, see https://blackcoinmore.org.
+EliteXcoin Core is the name of the open source software which enables use
+of the EliteXcoin protocol. It connects to the EliteXcoin peer-to-peer
+network to download and fully validate blocks and transactions. It also
+includes a wallet and graphical user interface, which can be optionally
+built.
 
 License
 -------
 
-Blackcoin More is released under the terms of the MIT license. See [COPYING](COPYING) for more
+EliteXcoin Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
 information or see https://opensource.org/licenses/MIT.
 
 Development Process
 -------------------
 
-The `master` branch is regularly built (see `doc/build-*.md` for instructions) and tested. [Tags](https://github.com/CoinBlack/blackcoin-more/tags) are created
-regularly to indicate new official, stable release versions of Blackcoin More.
+The `master` branch is regularly built (see `doc/build-*.md` for instructions) and tested.
 
 The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md)
 and useful hints for developers can be found in [doc/developer-notes.md](doc/developer-notes.md).
-
-The best place to get started is to join Blackcoin Discord: https://discord.blackcoin.nl
 
 Testing
 -------
@@ -57,8 +52,8 @@ There are also [regression and integration tests](/test), written
 in Python.
 These tests can be run (if the [test dependencies](/test) are installed) with: `test/functional/test_runner.py`
 
-The CI (Continuous Integration) systems make sure that every pull request is built for Windows, Linux, and macOS,
-and that unit/sanity tests are run automatically.
+The CI (Continuous Integration) systems build every pull request for Windows, Linux, and macOS,
+and run unit/sanity tests automatically.
 
 ### Manual Quality Assurance (QA) Testing
 
@@ -67,29 +62,9 @@ code. This is especially important for large or high-risk changes. It is useful
 to add a test plan to the pull request description if testing the changes is
 not straightforward.
 
-Translations
+Acknowledgements
 ------------
 
-Changes to translations as well as new translations can be submitted to
-[Blackcoin More's Transifex page](https://www.transifex.com/BlackcoinQT/BlackcoinMore/).
-
-Translations might be periodically pulled from Transifex and merged into the git repository. See the
-[translation process](doc/translation_process.md) for details on how this works.
-
-Branches
--------
-
-### develop
-The develop branch is typically used by developers as the main branch for integrating new features and changes into the codebase.
-Pull requests should always be made to this branch (except for critical fixes), and might possibly break the code.
-The develop branch is considered an unstable branch, as it is constantly updated with new code, and it may contain bugs or unfinished features. It is not guaranteed to work properly on any system.
-
-### master
-The master branch gets latest updates from the stable branch.
-However, it may contain experimental features and should be used with caution.
-
-### 26.x
-The release branch for Blackcoin More 26.x. It is intended to contain stable and functional code that has been thoroughly tested and reviewed.
-
-### 28.x
-The release branch for Blackcoin More 28.x. Contains functional but highly experimental code.
+EliteXcoin Core is a fork of [Blackcoin More](https://github.com/CoinBlack/blackcoin-more),
+which is itself built on [Bitcoin Core](https://github.com/bitcoin/bitcoin). Thanks to both
+projects' contributors for the codebase this builds on.

@@ -1,11 +1,11 @@
 Sample configuration files for:
 ```
-systemd: blackmored.service
-Upstart: blackmored.conf
-OpenRC:  blackmored.openrc
-         blackmored.openrcconf
-CentOS:  blackmored.init
-macOS:   org.blackcoin.blackmored.plist
+systemd: elitexcoind.service
+Upstart: elitexcoind.conf
+OpenRC:  elitexcoind.openrc
+         elitexcoind.openrcconf
+CentOS:  elitexcoind.init
+macOS:   org.elitexcoin.elitexcoind.plist
 ```
 have been made available to assist packagers in creating node packages here.
 

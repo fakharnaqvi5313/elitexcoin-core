@@ -72,8 +72,12 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
  */
 static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
-    const char* pszTimestamp = "20 Feb 2014 Bitcoin ATMs come to USA";
-    const CScript genesisOutputScript = CScript() << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f") << OP_CHECKSIG;
+    const char* pszTimestamp = "EliteXcoin 07/Aug/2026 A new proof-of-stake standard";
+    // Cosmetic only: this genesis coinbase output is permanently unspendable
+    // (block 0's outputs never enter the UTXO set), so this pubkey need not
+    // correspond to a real private key. Deterministically derived from a
+    // project string, not copied from any other chain's genesis key.
+    const CScript genesisOutputScript = CScript() << ParseHex("04e1916ce797c52f770c6de821460364b751be216fa48ccbd89969d61cc5aba317a53a984ea8a91501219b048614bafcd6f21dd9b5f362cdd2fee0e654d79569ab") << OP_CHECKSIG;
     return CreateGenesisBlock(pszTimestamp, genesisOutputScript, nTime, nNonce, nBits, nVersion, genesisReward);
 }
 
@@ -118,67 +122,66 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].min_activation_height = 0; // No activation delay
 
-        consensus.nProtocolV1RetargetingFixedTime = 1395631999;
-        consensus.nProtocolV2Time = 1407053625;
-        consensus.nProtocolV3Time = 1444028400;
-        consensus.nProtocolV3_1Time = 1713938400;
-        consensus.nLastPOWBlock = 10000;
+        // EliteXcoin: launch directly on the latest protocol rules (no need to
+        // replay Blackcoin's historical staged rollout on a brand new chain).
+        // nProtocolV2Time=0 also means nVersion>=7 is required from block 1,
+        // which is what makes GetHash() use SHA-256d (see primitives/block.cpp)
+        // instead of legacy scrypt for block identity - satisfying the coin
+        // spec's "keep SHA-256d" requirement chain-wide from genesis onward.
+        consensus.nProtocolV1RetargetingFixedTime = 0;
+        consensus.nProtocolV2Time = 0;
+        consensus.nProtocolV3Time = 0;
+        consensus.nProtocolV3_1Time = 0;
+        // EliteXcoin: block 1 carries the premine (see GetProofOfWorkSubsidy). Blocks
+        // 2-150 remain PoW-mineable as a short bootstrap window so the premine can
+        // clear nCoinbaseMaturity (100 confirmations, which also gates staking
+        // eligibility) - without this, the chain can never produce block 2 at all,
+        // since PoS requires an already-mature coin and none would exist yet.
+        // 100% PoS is enforced from block 151 onward.
+        consensus.nLastPOWBlock = 150;
         consensus.nStakeTimestampMask = 0xf; // 15
-        consensus.nCoinbaseMaturity = 500;
+        consensus.nCoinbaseMaturity = 100;
+        consensus.nStakeMinAge = 8 * 60 * 60; // 8 hours, no maximum
 
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000461191ade0b134e4e08"); // block 5214838
-        consensus.defaultAssumeValid = uint256S("0x19c385f36869c5b57e17b186414e0dc5d7fa71f24ec3084d03b7736b45e5a3e4"); // block 5214838
+        consensus.nMinimumChainWork = uint256{}; // fresh chain, no known work yet
+        consensus.defaultAssumeValid = uint256{};
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 32-bit integer with any alignment.
          */
-        pchMessageStart[0] = 0x70;
-        pchMessageStart[1] = 0x35;
-        pchMessageStart[2] = 0x22;
-        pchMessageStart[3] = 0x05;
-        nDefaultPort = 15714;
-        m_assumed_blockchain_size = 20;
+        pchMessageStart[0] = 0x45; // 'E'
+        pchMessageStart[1] = 0x58; // 'X'
+        pchMessageStart[2] = 0x43; // 'C'
+        pchMessageStart[3] = 0x01;
+        nDefaultPort = 17714;
+        m_assumed_blockchain_size = 1;
 
-        genesis = CreateGenesisBlock(1393221600, 164482, 0x1e0fffff, 1, 0);
+        genesis = CreateGenesisBlock(1785542400, 1074533027, 0x1e0fffff, 7, 0);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x000001faef25dec4fbcf906e6242621df2c183bf232f263d0ba5b101911e4563"));
-        assert(genesis.hashMerkleRoot == uint256S("0x12630d16a97f24b287c8c2594dda5fb98c9e6c70fc61d44191931ea2aa08dc90"));
+        assert(consensus.hashGenesisBlock == uint256S("0xdda603740ba428e068cdd999681bdf0a172fd67450b2470cd02f2aab47048cec"));
+        assert(genesis.hashMerkleRoot == uint256S("0xf447cb5d9ed4db902d1fc7f1da77e8b607d800930166cbef6c0715616f5631d9"));
 
-        // Note that of those which support the service bits prefix, most only support a subset of
-        // possible options.
-        // This is fine at runtime as we'll fall back to using them as an addrfetch if they don't support the
-        // service bits we want, but we should get them updated to support all service bits wanted by any
-        // release ASAP to avoid it where possible.
-        vSeeds.emplace_back("dnsseed.blackcoin.nl"); // hosted by blackcoin.nl
-        vSeeds.emplace_back("dnsseed2.blackcoin.nl"); // hosted by blackcoin.nl
-        vSeeds.emplace_back("electrum2.blackcoin.nl"); // hosted by blackcoin.nl
-        vSeeds.emplace_back("electrum3.blackcoin.nl");  // hosted by blackcoin.nl
+        // No seed infrastructure yet - populated in the ops/ launch phase.
+        // vSeeds.emplace_back("dnsseed.elitexcoin.io");
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,25);
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,85);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,153);
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,33);  // E...
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,75);  // X...
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,161);
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x88, 0xB2, 0x1E};
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x88, 0xAD, 0xE4};
 
-        bech32_hrp = "blk";
+        bech32_hrp = "exc";
 
-        vFixedSeeds = std::vector<uint8_t>(std::begin(chainparams_seed_main), std::end(chainparams_seed_main));
+        vFixedSeeds.clear(); // no fixed-IP seeds yet - populated in the ops/ launch phase.
 
         fDefaultConsistencyChecks = false;
         m_is_mockable_chain = false;
 
         checkpointData = {
             {
-                {   5001, uint256S("0x2fac9021be0c311e7b6dc0933a72047c70f817e2eb1e01bede011193ad1b28bc")}, // hardfork
-                {  10000, uint256S("0x0000000000827e4dc601f7310a91c45af8df0dfc1b6fa1dfa5b896cb00c8767c")}, // last pow block
-                {  38425, uint256S("0x62bf2e9701226d2f88d9fa99d650bd81f3faf2e56f305b7d71ccd1e7aa9c3075")}, // hardfork
-                { 254348, uint256S("0x9bf8d9bd757d3ef23d5906d70567e5f0da93f1e0376588c8d421a95e2421838b")}, // minor network split
-                { 319002, uint256S("0x0011494d03b2cdf1ecfc8b0818f1e0ef7ee1d9e9b3d1279c10d35456bc3899ef")}, // hardfork
-                { 872456, uint256S("0xe4fd321ced1de06213d2e246b150b4bfd8c4aa0989965dce88f2a58668c64860")}, // hardfork
-                {4232630, uint256S("0xae0c2a9bd13746e2887ca57bf1046b3c787a5ed1068fd1633a3575f08ee291fc")}, // Devfund
-                {4908715, uint256S("0x6f8e37e21aa2fba3f8e2d6825cb825ca290e9367ed08b8c30943bc16efcba119")}, // hardfork
+                {0, uint256S("0xdda603740ba428e068cdd999681bdf0a172fd67450b2470cd02f2aab47048cec")},
             }
         };
 
@@ -187,14 +190,15 @@ public:
         };
 
         chainTxData = ChainTxData{
-            // Data from RPC: getchaintxstats 40500 19c385f36869c5b57e17b186414e0dc5d7fa71f24ec3084d03b7736b45e5a3e4
-            .nTime    = 1734468656,
-            .nTxCount = 15786440,
-            .dTxRate  = 0.02988878182907771,
+            0,
+            0,
+            0,
         };
 
-        // A vector of p2sh addresses
-        vDevFundAddress = { "BKDvboD1CzZ5KycP1FRSXRoi7XXhHoQhS1" };
+        // Dev fund donation is opt-in (wallet.m_donation_percentage) and disabled
+        // by default while empty - set a real EliteXcoin address here before launch
+        // if this feature is wanted.
+        vDevFundAddress = {};
     }
 };
 
@@ -239,38 +243,32 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].min_activation_height = 0; // No activation delay
 
-        consensus.nProtocolV1RetargetingFixedTime = 1395631999;
-        consensus.nProtocolV2Time = 1407053625;
-        consensus.nProtocolV3Time = 1444028400;
-        consensus.nProtocolV3_1Time = 1667779200;
-        consensus.nLastPOWBlock = 0x7fffffff;
+        consensus.nProtocolV1RetargetingFixedTime = 0;
+        consensus.nProtocolV2Time = 0;
+        consensus.nProtocolV3Time = 0;
+        consensus.nProtocolV3_1Time = 0;
+        consensus.nLastPOWBlock = 150; // see CMainParams for why this can't be 1
         consensus.nStakeTimestampMask = 0xf;
-        consensus.nCoinbaseMaturity = 10;
+        consensus.nCoinbaseMaturity = 100;
+        consensus.nStakeMinAge = 8 * 60 * 60;
 
-        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000005e076ec35dd78945ce"); // block 2139564
-        consensus.defaultAssumeValid = uint256S("0xade1c1bd7d6b75cd95b5ec841ffaff24f79ab71c084a3fe8374c2680c72f6b4e"); // block 2139564
+        consensus.nMinimumChainWork = uint256{};
+        consensus.defaultAssumeValid = uint256{};
 
-        pchMessageStart[0] = 0xcd;
-        pchMessageStart[1] = 0xf2;
-        pchMessageStart[2] = 0xc0;
-        pchMessageStart[3] = 0xef;
-        nDefaultPort = 25714;
-        m_assumed_blockchain_size = 5;
+        pchMessageStart[0] = 0x45; // 'E'
+        pchMessageStart[1] = 0x58; // 'X'
+        pchMessageStart[2] = 0x43; // 'C'
+        pchMessageStart[3] = 0x02;
+        nDefaultPort = 27714;
+        m_assumed_blockchain_size = 1;
 
-        genesis = CreateGenesisBlock(1393221600, 216178, 0x1f00ffff, 1, 0);
+        genesis = CreateGenesisBlock(1785542400, 3221283237, 0x1f00ffff, 7, 0);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x0000724595fb3b9609d441cbfb9577615c292abf07d996d3edabc48de843642d"));
-        assert(genesis.hashMerkleRoot == uint256S("0x12630d16a97f24b287c8c2594dda5fb98c9e6c70fc61d44191931ea2aa08dc90"));
+        assert(consensus.hashGenesisBlock == uint256S("0x3be661d56602c8cb7ec959c93a6d1f821830f88b1e80c5be59977059d54550d6"));
+        assert(genesis.hashMerkleRoot == uint256S("0xf447cb5d9ed4db902d1fc7f1da77e8b607d800930166cbef6c0715616f5631d9"));
 
-        // Note that of those which support the service bits prefix, most only support a subset of
-        // possible options.
-        // This is fine at runtime as we'll fall back to using them as an addrfetch if they don't support the
-        // service bits we want, but we should get them updated to support all service bits wanted by any
-        // release ASAP to avoid it where possible.
-        vSeeds.emplace_back("electrum2.blackcoin.nl"); // hosted by blackcoin.nl
-        vSeeds.emplace_back("electrum3.blackcoin.nl");  // hosted by blackcoin.nl
-        vSeeds.emplace_back("dnsseed.blackcoin.nl"); // hosted by blackcoin.nl
-        vSeeds.emplace_back("dnsseed2.blackcoin.nl"); // hosted by blackcoin.nl
+        // No seed infrastructure yet - populated in the ops/ launch phase.
+        // vSeeds.emplace_back("testnet-dnsseed.elitexcoin.io");
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,111);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,196);
@@ -278,19 +276,16 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x35, 0x87, 0xCF};
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x35, 0x83, 0x94};
 
-        bech32_hrp = "tblk";
+        bech32_hrp = "texc";
 
-        vFixedSeeds = std::vector<uint8_t>(std::begin(chainparams_seed_test), std::end(chainparams_seed_test));
+        vFixedSeeds.clear();
 
         fDefaultConsistencyChecks = false;
         m_is_mockable_chain = false;
 
         checkpointData = {
             {
-                {  90235, uint256S("0x567898e79184dc2f7dc3a661f794f28566e4b856d70180914f7371b1b3cc82d8")}, // initial checkpoint
-                {1320664, uint256S("0x64fa6a5414c6797629d34ef150c46486a5e1d49d2bceb87d6da14a501f838afd")}, // hardfork
-                {1415393, uint256S("0x5d5c42500cc6057533e249ba9eeb9b5e998aff30468c904bc267ec9bccbc8b39")}, // start devfund
-                {2070000, uint256S("0xf8e2c3919353487f73cd957f29654dc00a3b0c99a9fbf38a3514cdead626f0ec")}, // segwit activated
+                {0, uint256S("0x3be661d56602c8cb7ec959c93a6d1f821830f88b1e80c5be59977059d54550d6")},
             }
         };
 
@@ -299,14 +294,12 @@ public:
         };
 
         chainTxData = ChainTxData{
-            // Data from RPC: getchaintxstats 40500 ade1c1bd7d6b75cd95b5ec841ffaff24f79ab71c084a3fe8374c2680c72f6b4e
-            .nTime    = 1734469040,
-            .nTxCount = 4298002,
-            .dTxRate  = 0.02974604428985235,
+            0,
+            0,
+            0,
         };
 
-        // A vector of p2sh addresses
-        vDevFundAddress = { "n14L5xqAs7QRzNiTLPNaPeqaF9CRoxzVnU" };
+        vDevFundAddress = {};
     }
 };
 
@@ -395,6 +388,7 @@ public:
         consensus.nLastPOWBlock = 0x7fffffff;
         consensus.nStakeTimestampMask = 0xf;
         consensus.nCoinbaseMaturity = 10;
+        consensus.nStakeMinAge = 8 * 60 * 60;
 
         // message start is defined as the first 4 bytes of the sha256d of the block script
         HashWriter h{};
@@ -402,12 +396,12 @@ public:
         uint256 hash = h.GetHash();
         std::copy_n(hash.begin(), 4, pchMessageStart.begin());
 
-        nDefaultPort = 45714;
+        nDefaultPort = 47714;
 
-        genesis = CreateGenesisBlock(1393221600, 216178, 0x1f00ffff, 1, 0);
+        genesis = CreateGenesisBlock(1785542400, 3221283237, 0x1f00ffff, 7, 0);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x0000724595fb3b9609d441cbfb9577615c292abf07d996d3edabc48de843642d"));
-        assert(genesis.hashMerkleRoot == uint256S("0x12630d16a97f24b287c8c2594dda5fb98c9e6c70fc61d44191931ea2aa08dc90"));
+        assert(consensus.hashGenesisBlock == uint256S("0x3be661d56602c8cb7ec959c93a6d1f821830f88b1e80c5be59977059d54550d6"));
+        assert(genesis.hashMerkleRoot == uint256S("0xf447cb5d9ed4db902d1fc7f1da77e8b607d800930166cbef6c0715616f5631d9"));
 
         vFixedSeeds.clear();
 
@@ -419,7 +413,7 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x88, 0xB2, 0x1E};
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x88, 0xAD, 0xE4};
 
-        bech32_hrp = "tblk";
+        bech32_hrp = "texc";
 
         fDefaultConsistencyChecks = false;
         m_is_mockable_chain = false;
@@ -472,22 +466,23 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].min_activation_height = 0; // No activation delay
 
-        consensus.nProtocolV1RetargetingFixedTime = 1395631999;
-        consensus.nProtocolV2Time = 1407053625;
-        consensus.nProtocolV3Time = 1444028400;
-        consensus.nProtocolV3_1Time = 1713938400;
-        consensus.nLastPOWBlock = 0x7fffffff;
+        consensus.nProtocolV1RetargetingFixedTime = 0;
+        consensus.nProtocolV2Time = 0;
+        consensus.nProtocolV3Time = 0;
+        consensus.nProtocolV3_1Time = 0;
+        consensus.nLastPOWBlock = 0x7fffffff; // regtest keeps PoW mineable on demand (generatetoaddress, functional tests)
         consensus.nStakeTimestampMask = 0xf;
         consensus.nCoinbaseMaturity = 10;
+        consensus.nStakeMinAge = 1; // effectively instant, for fast local/functional testing
 
         consensus.nMinimumChainWork = uint256{};
         consensus.defaultAssumeValid = uint256{};
 
-        pchMessageStart[0] = 0x70;
-        pchMessageStart[1] = 0x35;
-        pchMessageStart[2] = 0x22;
-        pchMessageStart[3] = 0x06;
-        nDefaultPort = 35714;
+        pchMessageStart[0] = 0x45; // 'E'
+        pchMessageStart[1] = 0x58; // 'X'
+        pchMessageStart[2] = 0x43; // 'C'
+        pchMessageStart[3] = 0x03;
+        nDefaultPort = 37714;
         m_assumed_blockchain_size = 0;
 
         for (const auto& [dep, height] : opts.activation_heights) {
@@ -509,10 +504,10 @@ public:
             consensus.vDeployments[deployment_pos].min_activation_height = version_bits_params.min_activation_height;
         }
 
-        genesis = CreateGenesisBlock(1393221600, 216178, 0x1f00ffff, 1, 0);
+        genesis = CreateGenesisBlock(1785542400, 3221283237, 0x1f00ffff, 7, 0);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x0000724595fb3b9609d441cbfb9577615c292abf07d996d3edabc48de843642d"));
-        assert(genesis.hashMerkleRoot == uint256S("0x12630d16a97f24b287c8c2594dda5fb98c9e6c70fc61d44191931ea2aa08dc90"));
+        assert(consensus.hashGenesisBlock == uint256S("0x3be661d56602c8cb7ec959c93a6d1f821830f88b1e80c5be59977059d54550d6"));
+        assert(genesis.hashMerkleRoot == uint256S("0xf447cb5d9ed4db902d1fc7f1da77e8b607d800930166cbef6c0715616f5631d9"));
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
         vSeeds.clear();
@@ -523,25 +518,14 @@ public:
 
         checkpointData = {
             {
-                {0, uint256S("0x0000724595fb3b9609d441cbfb9577615c292abf07d996d3edabc48de843642d")},
+                {0, uint256S("0x3be661d56602c8cb7ec959c93a6d1f821830f88b1e80c5be59977059d54550d6")},
             }
         };
 
-        m_assumeutxo_data = {
-            {
-                .height = 110,
-                .hash_serialized = AssumeutxoHash{uint256S("0x6657b736d4fe4db0cbc796789e812d5dba7f5c143764b1b6905612f1830609d1")},
-                .nChainTx = 111,
-                .blockhash = uint256S("0x696e92821f65549c7ee134edceeeeaaa4105647a3c4fd9f298c0aec0ab50425c")
-            },
-            {
-                // For use by test/functional/feature_assumeutxo.py
-                .height = 299,
-                .hash_serialized = AssumeutxoHash{uint256S("0x61d9c2b29a2571a5fe285fe2d8554f91f93309666fc9b8223ee96338de25ff53")},
-                .nChainTx = 300,
-                .blockhash = uint256S("0x7e0517ef3ea6ecbed9117858e42eedc8eb39e8698a38dcbd1b3962a283233f4c")
-            },
-        };
+        // Blackcoin's assumeutxo snapshot fixtures (feature_assumeutxo.py) are tied
+        // to their regtest chain history and don't apply post-rebrand; cleared until
+        // EliteXcoin has its own regtest snapshot fixtures.
+        m_assumeutxo_data = {};
 
         chainTxData = ChainTxData{
             0,
@@ -555,7 +539,7 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = {0x04, 0x88, 0xB2, 0x1E};
         base58Prefixes[EXT_SECRET_KEY] = {0x04, 0x88, 0xAD, 0xE4};
 
-        bech32_hrp = "blrt";
+        bech32_hrp = "excrt";
 
         vDevFundAddress = {};
     }
